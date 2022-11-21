@@ -3,7 +3,19 @@ toc::[]
 
 = Fault Tolerance
 
+When we request a random activity for our ToDo-list we are using an internet service. If our connection is interrupted, this will no longer work. Instead of getting an exception we now want to add one of some default activities to the list.
 
+== Modify use case
 
+When the REST client cannot get a response from BoredAPI (in time) instead of throwing the exception it returns one of three default activities.
+
+Again you can test this with Swagger UI while disabling your WLAN.
+
+== Adapt tests
+
+Adapt/implement tests for the use case where Wiremock simulates a broken or to slow connection. Now instead of the exception the use case should return one of our default activities.
 
 == Links
+
+- https://quarkus.io/guides/rest-client-reactive
+- https://quarkus.io/guides/rest-client#using-a-mock-http-server-for-tests

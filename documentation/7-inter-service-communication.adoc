@@ -20,7 +20,6 @@ Change the use case to call the client instead of the hardcoded answer and check
 
 The communication with the external service in the REST client should be logged. For this you can add to the `application.properties`:
 ```
-quarkus.rest-client.bored-api.url=https://www.boredapi.com/api/
 %test.quarkus.rest-client.logging.scope=request-response
 %dev.quarkus.rest-client.logging.scope=request-response
 quarkus.log.category."org.jboss.resteasy.reactive.client.logging".level=DEBUG
@@ -28,8 +27,11 @@ quarkus.log.category."org.jboss.resteasy.reactive.client.logging".level=DEBUG
 
 == Add tests
 
-Implement a test for the use case and mock the REST client.
-Also add a test for the use case and REST client that checks that the response is handled correctly. For this stub the BoredAPI with Wiremock on the network level. The communication should now be handled by Wiremock and the test does not talk to the real service.
+Implement two types of tests for the use case:
+
+First, add a test for the use case which mocks the REST client and checks the use case logic.
+
+Secondly, add a test which tests the integration with the REST API. For this stub the Bored API with WireMock on network level. The communication should be transparently handled by WireMock and the test must not talk to the real service
 
 == Links
 
