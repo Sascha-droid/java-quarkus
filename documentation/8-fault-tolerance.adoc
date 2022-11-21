@@ -1,0 +1,9 @@
+:toc: macro
+toc::[]
+
+= Fault Tolerance
+
+
+
+
+== Links

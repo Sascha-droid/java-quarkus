@@ -1,0 +1,37 @@
+:toc: macro
+toc::[]
+
+= Inter-Service Communication
+
+Now that our ToDo-list is running we want to add some new todos from another service. For this we'll get random activities from the webservice https://www.boredapi.com/api/activity. Decide if you implement the logic or the tests first.
+
+== Add endpoint and use case for requesting a random activity
+
+Implement the endpoint `/task/list/{id}/random-activity` in our service. When it is called a new task is added to our ToDo-list, that describes an activity from  https://www.boredapi.com/api/activity.
+Also implement the corresponding use case with a hardcoded response. You can test this now with the Swagger UI.
+
+== Add REST client
+
+Extend our application with a REST client called `BoredApi`. Use Quarkus MicroProfile REST to connect to the service and get a JSON with an activity to add to our ToDo-list. Throw a helpful exception when the service is not reachable.
+
+Change the use case to call the client instead of the hardcoded answer and check it again with Swagger UI.
+
+== Add Logging
+
+The communication with the external service in the REST client should be logged. For this you can add to the `application.properties`:
+```
+quarkus.rest-client.bored-api.url=https://www.boredapi.com/api/
+%test.quarkus.rest-client.logging.scope=request-response
+%dev.quarkus.rest-client.logging.scope=request-response
+quarkus.log.category."org.jboss.resteasy.reactive.client.logging".level=DEBUG
+```
+
+== Add tests
+
+Implement a test for the use case and mock the REST client.
+Also add a test for the use case and REST client that checks that the response is handled correctly. For this stub the BoredAPI with Wiremock on the network level. The communication should now be handled by Wiremock and the test does not talk to the real service.
+
+== Links
+
+- https://quarkus.io/guides/rest-client-reactive
+- https://quarkus.io/guides/rest-client#using-a-mock-http-server-for-tests
