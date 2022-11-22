@@ -5,15 +5,15 @@ toc::[]
 
 When we request a random activity for our ToDo-list we are using an internet service. If our connection is interrupted, this will no longer work. Instead of getting an exception we now want to add one of some default activities to the list.
 
-== Modify use case
+== Implement a fallback in ActivityService
 
-When the REST client cannot get a response from BoredAPI (in time) instead of throwing the exception it returns one of three default activities.
+When the REST client cannot get a response from BoredAPI (in time) instead of throwing an exception the ActivityService returns one of three default activities. Now the contract of the service will always return a response and the use case does not have to handle an exception.
 
 Again you can test this with Swagger UI while disabling your WLAN.
 
 == Adapt tests
 
-Adapt/implement tests for the use case where Wiremock simulates a broken or to slow connection. Now instead of the exception the use case should return one of our default activities.
+Adapt tests if they are failing now because we now always get an answer and no longer an exception.
 
 == Links
 

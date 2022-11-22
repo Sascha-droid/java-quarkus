@@ -7,18 +7,18 @@ Now that our ToDo-list is running we want to add some new todos from another ser
 
 == Add endpoint and use case for requesting a random activity
 
-Implement the endpoint `/task/list/{id}/random-activity` in our service. When it is called a new task is added to our ToDo-list, that describes an activity from  https://www.boredapi.com/api/activity.
-Also implement the corresponding use case with a hardcoded response. You can test this now with the Swagger UI.
+Implement the endpoint `/task/list/{id}/random-activity` in our service as a POST request. When it is called a new task should be added to our ToDo-list, that describes an activity from  https://www.boredapi.com/api/activity.
+Also implement the corresponding use case with a hardcoded response. You can test this now with the Swagger UI. After calling the endpoint for a given taskList id you should see a new entry when reloading the ToDo-list.
 
 == Add REST client
 
-Extend our application with a REST client called `BoredApi`. Use Quarkus MicroProfile REST to connect to the service and get a JSON with an activity to add to our ToDo-list. Throw a helpful exception when the service is not reachable.
+Extend our application with a REST client called `BoredApi`. This is used be the also to implement `ActivityService`. Use Quarkus MicroProfile REST to connect to the web service https://www.boredapi.com/api/activity and get a JSON with an activity to add to our ToDo-list. We only need the name of the activity, not the whole response. Throw a helpful exception when the service is not reachable or other errors occurred.
 
-Change the use case to call the client instead of the hardcoded answer and check it again with Swagger UI.
+Change the use case to call the client instead of the hardcoded response and check it again with Swagger UI.
 
 == Add Logging
 
-The communication with the external service in the REST client should be logged. For this you can add to the `application.properties`:
+The communication with the external service in the REST client should be logged. For this you can add in the `application.properties`:
 ```
 %test.quarkus.rest-client.logging.scope=request-response
 %dev.quarkus.rest-client.logging.scope=request-response
@@ -29,9 +29,8 @@ quarkus.log.category."org.jboss.resteasy.reactive.client.logging".level=DEBUG
 
 Implement two types of tests for the use case:
 
-First, add a test for the use case which mocks the REST client and checks the use case logic.
-
-Secondly, add a test which tests the integration with the REST API. For this stub the Bored API with WireMock on network level. The communication should be transparently handled by WireMock and the test must not talk to the real service
+1. Add a test for the use case which mocks the REST client and checks the use case logic.
+2. Add a test which tests the integration with the REST API. For this stub the Bored API with WireMock on network level. The communication should be transparently handled by WireMock and the test must not talk to the real service.
 
 == Links
 
