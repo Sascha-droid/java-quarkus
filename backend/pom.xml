@@ -11,6 +11,23 @@
   <!--
   https://code.quarkus.io/?g=org.example&a=demo&e=resteasy-reactive-jsonb&e=spring-data-jpa&e=flyway&e=jdbc-postgresql&e=smallrye-jwt
   -->
+  <properties>
+    <compiler-plugin.version>3.8.1</compiler-plugin.version>
+    <maven.compiler.release>11</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+    <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+    <quarkus.platform.version>2.12.2.Final</quarkus.platform.version>
+
+    <!-- Run integration tests by default -->
+    <skipITs>false</skipITs>
+    <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
+    <mapstruct.version>1.4.2.Final</mapstruct.version>
+    <querydsl.version>4.3.1</querydsl.version>
+     <!-- automatically run annotation processors within the incremental compilation (Eclipse only) -->
+    <m2e.apt.activation>jdt_apt</m2e.apt.activation>
+  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
