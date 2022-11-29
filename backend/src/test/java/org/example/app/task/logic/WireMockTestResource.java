@@ -3,6 +3,7 @@ package org.example.app.task.logic;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
 import java.util.Collections;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class WireMockTestResource implements QuarkusTestResourceLifecycleManager
   @Override
   public Map<String, String> start() {
 
-    this.wireMockServer = new WireMockServer();
+    this.wireMockServer = new WireMockServer(options().dynamicPort());
     this.wireMockServer.start();
 
     this.wireMockServer
