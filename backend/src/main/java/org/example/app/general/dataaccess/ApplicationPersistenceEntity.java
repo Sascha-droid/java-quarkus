@@ -9,6 +9,7 @@ import jakarta.persistence.Version;
 import org.example.app.general.common.ApplicationEntity;
 
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;

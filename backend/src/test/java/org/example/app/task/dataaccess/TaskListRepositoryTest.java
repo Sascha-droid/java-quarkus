@@ -6,8 +6,8 @@ import static org.assertj.core.api.BDDAssertions.then;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 
 import org.example.app.task.ReplaceUnderscoresAndCamelCase;
 import org.junit.jupiter.api.DisplayNameGeneration;

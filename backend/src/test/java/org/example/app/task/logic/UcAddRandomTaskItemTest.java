@@ -4,7 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.assertj.core.api.BDDAssertions;
 import org.example.app.task.dataaccess.TaskItemEntity;

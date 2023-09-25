@@ -1,9 +1,9 @@
 package org.example.app.task.logic;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.transaction.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.transaction.Transactional;
 
 import org.example.app.task.dataaccess.TaskItemEntity;
 import org.example.app.task.dataaccess.TaskItemRepository;

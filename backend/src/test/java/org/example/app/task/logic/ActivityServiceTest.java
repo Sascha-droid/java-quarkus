@@ -2,7 +2,7 @@ package org.example.app.task.logic;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
