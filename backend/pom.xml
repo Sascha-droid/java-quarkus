@@ -22,7 +22,7 @@
     <!-- Run integration tests by default -->
     <skipITs>false</skipITs>
     <surefire-plugin.version>3.0.0</surefire-plugin.version>
-    <mapstruct.version>1.4.2.Final</mapstruct.version>
+    <mapstruct.version>1.5.5.Final</mapstruct.version>
     <querydsl.version>5.0.0</querydsl.version>
     <!-- automatically run annotation processors within the incremental compilation (Eclipse only) -->
     <m2e.apt.activation>jdt_apt</m2e.apt.activation>
