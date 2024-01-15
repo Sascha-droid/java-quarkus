@@ -40,6 +40,7 @@ curl -X POST http://localhost:11434/api/generate -d '{
 }'
 ----
 If everything is running correctly, you will receive an answer from the AI after a short time.
+=== Add REST client
 
 === Generate and use REST client
 In `src/main/openapi/ollama_api.yaml` you find the OpenAPI specification (OAS) of the `/api/generate` endpoint of Ollama. With the Quarkus OpenAPI generator it is possible to generate a REST client and corresponding classes from it during the Maven build process.
@@ -204,6 +205,7 @@ try {
 }
 ----
 
+=== Links
 === Links
 
 - https://quarkus.io/guides/rest-client-reactive

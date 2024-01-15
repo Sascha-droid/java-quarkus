@@ -11,22 +11,6 @@
   <!--
   https://code.quarkus.io/?g=org.example&a=demo&e=resteasy-reactive-jsonb&e=spring-data-jpa&e=flyway&e=jdbc-postgresql&e=smallrye-jwt
   -->
-  <properties>
-    <compiler-plugin.version>3.8.1</compiler-plugin.version>
-    <maven.compiler.release>11</maven.compiler.release>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-    <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>3.2.3.Final</quarkus.platform.version>
-    <!-- Run integration tests by default -->
-    <skipITs>false</skipITs>
-    <surefire-plugin.version>3.0.0</surefire-plugin.version>
-    <mapstruct.version>1.5.5.Final</mapstruct.version>
-    <querydsl.version>5.0.0</querydsl.version>
-    <!-- automatically run annotation processors within the incremental compilation (Eclipse only) -->
-    <m2e.apt.activation>jdt_apt</m2e.apt.activation>
-  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -161,10 +145,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock-jre8</artifactId>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock</artifactId>
+      <version>${wiremock.version}</version>
       <scope>test</scope>
-      <version>2.35.0</version>
     </dependency>
     <dependency>
       <groupId>io.quarkiverse.openapi.generator</groupId>
@@ -220,6 +204,7 @@
               <version>${mapstruct.version}</version>
             </path>
           </annotationProcessorPaths>
+          <release>${java.version}</release>
         </configuration>
       </plugin>
       <plugin>

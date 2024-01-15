@@ -43,9 +43,25 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQuery;
-
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import org.example.app.general.common.search.LikePatternSyntax;
+import org.example.app.general.common.search.SearchCriteria;
+import org.example.app.general.common.search.SortOrderBy;
+import org.example.app.general.common.search.SortOrderDirection;
+import org.example.app.general.common.search.StringSearchOperator;
+import org.example.app.general.common.search.StringSearchOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Function;
 
 /**
  * Abstract base class for query fragment of spring-data repository.
