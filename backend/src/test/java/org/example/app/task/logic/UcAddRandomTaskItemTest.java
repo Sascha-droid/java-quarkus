@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import io.quarkus.test.InjectMock;
 import jakarta.inject.Inject;
 
 import org.assertj.core.api.BDDAssertions;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 
 /**
  * Test of {@link UcAddRandomActivityTaskItem}
