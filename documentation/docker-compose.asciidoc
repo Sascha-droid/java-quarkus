@@ -54,7 +54,14 @@ Docker Compose works by applying many rules declared within the `docker-compose.
 Further, a file named `.env` is used to configure environment variables for a docker container managed by docker compose.
 See `backend/.env` for an example.
 
-* Start application by running `docker compose up -d`
+* To provide the Ollama container with the required environment variables, create an `.env` file under `/backend` and add two variables:
++
+[source, properties]
+----
+OLLAMA_MODEL=llama3.2
+OLLAMA_KEEP_ALIVE_TIME=30m
+----
+* Start application by running `docker-compose up`
 +
 With this command we started container for our backend app, database, keycloak and ollama.
 These images are defined as services in docker compose.

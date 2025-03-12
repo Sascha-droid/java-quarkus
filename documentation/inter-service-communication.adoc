@@ -206,7 +206,6 @@ try {
 ----
 
 === Links
-=== Links
 
 - https://quarkus.io/guides/rest-client-reactive
 - https://quarkus.io/guides/rest-client#using-a-mock-http-server-for-tests
