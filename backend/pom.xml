@@ -155,6 +155,10 @@
       <artifactId>quarkus-openapi-generator</artifactId>
       <version>${openapi.generator.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client-reactive-jackson</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
