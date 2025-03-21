@@ -1,5 +1,8 @@
 package org.example.app.task.service;
 
+import java.net.URI;
+
+import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +22,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.example.app.general.common.security.PermissionService;
 import org.example.app.task.common.TaskItemEto;
 import org.example.app.task.common.TaskListCto;
 import org.example.app.task.common.TaskListEto;
@@ -30,13 +34,14 @@ import org.example.app.task.logic.UcFindTaskList;
 import org.example.app.task.logic.UcSaveTaskItem;
 import org.example.app.task.logic.UcSaveTaskList;
 
-import java.net.URI;
+import static org.example.app.general.common.security.ApplicationAccessControlConfig.*;
 import java.util.Map;
 
 /**
  * Rest service for {@link org.example.app.task.common.TaskList}.
  */
 @Path("/task")
+@Authenticated
 public class TaskService {
 
   @Inject
@@ -60,6 +65,9 @@ public class TaskService {
   @Inject
   private UcAddRandomActivityTaskItem ucAddRandomActivityTask;
 
+  @Inject
+  private PermissionService permissionService;
+
   /**
    * @param taskList the {@link TaskListEto} to save (insert or update).
    * @return response
@@ -73,7 +81,6 @@ public class TaskService {
   @APIResponse(responseCode = "400", description = "Validation error")
   @APIResponse(responseCode = "500", description = "Server unavailable or a server-side error occurred")
   public Response saveTask(@Valid TaskListEto taskList) {
-
     Long taskListId = this.ucSaveTaskList.save(taskList);
     if (taskList.getId() == null || taskList.getId() != taskListId) {
       return Response.created(URI.create("/task/list/" + taskListId)).build();
@@ -92,14 +99,17 @@ public class TaskService {
   @APIResponse(responseCode = "200", description = "Task list", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TaskListEto.class)))
   @APIResponse(responseCode = "404", description = "Task list not found")
   @APIResponse(responseCode = "500", description = "Server unavailable or a server-side error occurred")
-  public TaskListEto findTaskList(
+  public Response findTaskList(
       @Parameter(description = "The id of the task list to retrieve", required = true, example = "1", schema = @Schema(type = SchemaType.INTEGER)) @PathParam("id") Long id) {
-
+    Response permissionResponse = permissionService.checkPermission(PERMISSION_FIND_TASK_LIST);
+    if (permissionResponse != null) {
+      return permissionResponse;
+    }
     TaskListEto task = this.ucFindTaskList.findById(id);
     if (task == null) {
       throw new NotFoundException("TaskList with id " + id + " does not exist.");
     }
-    return task;
+    return Response.ok(task).build();
   }
 
   /**
@@ -113,14 +123,17 @@ public class TaskService {
   @APIResponse(responseCode = "200", description = "Task list with task items", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TaskListCto.class)))
   @APIResponse(responseCode = "404", description = "Task list not found")
   @APIResponse(responseCode = "500", description = "Server unavailable or a server-side error occurred")
-  public TaskListCto findTaskListWithItems(
+  public Response findTaskListWithItems(
       @Parameter(description = "The id of the task list to retrieve", required = true, example = "1", schema = @Schema(type = SchemaType.INTEGER)) @PathParam("id") Long id) {
-
+    Response permissionResponse = permissionService.checkPermission(PERMISSION_FIND_TASK_LIST);
+    if (permissionResponse != null) {
+      return permissionResponse;
+    }
     TaskListCto task = this.ucFindTaskList.findWithItems(id);
     if (task == null) {
       throw new NotFoundException("TaskList with id " + id + " does not exist.");
     }
-    return task;
+    return Response.ok(task).build();
   }
 
   /**
@@ -132,10 +145,14 @@ public class TaskService {
   @APIResponse(responseCode = "204", description = "Task list deleted")
   @APIResponse(responseCode = "201", description = "Task list successfully created")
   @APIResponse(responseCode = "500", description = "Server unavailable or a server-side error occurred")
-  public void deleteTaskList(
+  public Response deleteTaskList(
       @Parameter(description = "The id of the task list to delete", required = true, example = "1", schema = @Schema(type = SchemaType.INTEGER)) @PathParam("id") Long id) {
-
+    Response permissionResponse = permissionService.checkPermission(PERMISSION_DELETE_TASK_LIST);
+    if (permissionResponse != null) {
+      return permissionResponse;
+    }
     this.ucDeleteTaskList.delete(id);
+    return Response.status(Response.Status.NO_CONTENT).build();
   }
 
   /**
@@ -150,7 +167,10 @@ public class TaskService {
   @APIResponse(responseCode = "500", description = "Server unavailable or a server-side error occurred")
   public Response addRandomActivity(
       @Parameter(description = "The id of the task list for which to add the task", required = true, example = "1", schema = @Schema(type = SchemaType.INTEGER)) @PathParam("id") Long id) {
-
+    Response permissionResponse = permissionService.checkPermission(PERMISSION_SAVE_TASK_ITEM);
+    if (permissionResponse != null) {
+      return permissionResponse;
+    }
     Long taskItemId = this.ucAddRandomActivityTask.addRandom(id);
     return Response.created(URI.create("/task/item/" + taskItemId)).build();
   }
@@ -216,7 +236,10 @@ public class TaskService {
   @APIResponse(responseCode = "400", description = "Validation error")
   @APIResponse(responseCode = "500", description = "Server unavailable or a server-side error occurred")
   public Response saveTaskItem(@Valid TaskItemEto item) {
-
+      Response permissionResponse = permissionService.checkPermission(PERMISSION_SAVE_TASK_ITEM);
+      if (permissionResponse != null) {
+          return permissionResponse;
+      }
     Long taskItemId = this.ucSaveTaskItem.save(item);
     if (item.getId() == null || item.getId() != taskItemId) {
       return Response.created(URI.create("/task/item/" + taskItemId)).entity(taskItemId).build();
@@ -235,14 +258,17 @@ public class TaskService {
   @APIResponse(responseCode = "200", description = "Task item", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TaskItemEto.class)))
   @APIResponse(responseCode = "404", description = "Task item not found")
   @APIResponse(responseCode = "500", description = "Server unavailable or a server-side error occurred")
-  public TaskItemEto findTaskItem(
+  public Response findTaskItem(
       @Parameter(description = "The id of the task item to retrieve", required = true, example = "1", schema = @Schema(type = SchemaType.INTEGER)) @PathParam("id") Long id) {
-
+    Response permissionResponse = permissionService.checkPermission(PERMISSION_FIND_TASK_ITEM);
+    if (permissionResponse != null) {
+      return permissionResponse;
+    }
     TaskItemEto item = this.ucFindTaskItem.findById(id);
     if (item == null) {
       throw new NotFoundException("TaskItem with id " + id + " does not exist.");
     }
-    return item;
+    return Response.ok(item).build();
   }
 
   /**
@@ -253,10 +279,14 @@ public class TaskService {
   @Operation(summary = "Delete task item", description = "Delete a task item")
   @APIResponse(responseCode = "204", description = "Task list deleted")
   @APIResponse(responseCode = "500", description = "Server unavailable or a server-side error occurred")
-  public void deleteTaskItem(
+  public Response deleteTaskItem(
       @Parameter(description = "The id of the task item to delete", required = true, example = "1", schema = @Schema(type = SchemaType.INTEGER)) @PathParam("id") Long id) {
-
+    Response permissionResponse = permissionService.checkPermission(PERMISSION_DELETE_TASK_ITEM);
+    if (permissionResponse != null) {
+      return permissionResponse;
+    }
     this.ucDeleteTaskItem.delete(id);
+    return Response.status(Response.Status.NO_CONTENT).build();
   }
 
 }
