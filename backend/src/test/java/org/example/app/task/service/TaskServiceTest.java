@@ -3,6 +3,15 @@ package org.example.app.task.service;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.http.ContentType;
+import static io.restassured.RestAssured.given;
+import static java.util.Arrays.asList;
+import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
+import io.quarkus.test.security.TestSecurity;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.BDDAssertions;
 import org.example.app.task.common.TaskItemEto;
@@ -67,6 +76,7 @@ class TaskServiceTest extends Assertions {
     class Post {
 
       @Test
+      @TestSecurity(user = "alice", roles = {"admin", "user"})
       void shouldCallSaveUseCaseAndReturn204WhenCreatingTaskList() {
 
         given(TaskServiceTest.this.saveTaskList.save(Mockito.any())).willReturn(123L);
@@ -76,10 +86,11 @@ class TaskServiceTest extends Assertions {
       }
 
       @Test
+      @TestSecurity(user = "alice", roles = {"admin", "user"})
       void shouldFailWith400AndValidationErrorWhenTitleIsEmpty() {
 
         given().when().body("{ \"title\": \"\" }").contentType(ContentType.JSON).post("/task/list").then()
-            .statusCode(400);
+                .statusCode(400);
         then(TaskServiceTest.this.saveTaskList).shouldHaveNoInteractions();
       }
     }
@@ -93,6 +104,7 @@ class TaskServiceTest extends Assertions {
       class Get {
 
         @Test
+        @TestSecurity(user = "alice", roles = {"admin", "user"})
         void shouldReturnJsonWhenTaskListExists() {
 
           given(TaskServiceTest.this.findTaskList.findById(anyLong())).willReturn(TaskListMother.complete());
@@ -102,11 +114,17 @@ class TaskServiceTest extends Assertions {
         }
 
         @Test
+        @TestSecurity(user = "alice", roles = {"admin", "user"})
         void shouldReturn404WhenUnknownTaskList() {
 
           given(TaskServiceTest.this.findTaskList.findById(anyLong())).willReturn(null);
 
           given().when().get("/task/list/99").then().statusCode(404);
+        }
+        @Test
+        @TestSecurity(user = "alice", roles = {})
+        void shouldFailWith403() {
+          given().when().get("/task/list/99").then().statusCode(403);
         }
       }
 
@@ -115,10 +133,17 @@ class TaskServiceTest extends Assertions {
       class Delete {
 
         @Test
+        @TestSecurity(user = "alice", roles = {"admin", "user"})
         void shouldCallDeleteUseCaseAndReturn204() {
 
           given().when().delete("/task/list/1").then().statusCode(204);
           then(TaskServiceTest.this.deleteTaskList).should().delete(1L);
+        }
+
+        @Test
+        @TestSecurity(user = "alice", roles = {})
+        void shouldFailWith403() {
+          given().when().delete("/task/list/1").then().statusCode(403);
         }
       }
 
@@ -148,6 +173,7 @@ class TaskServiceTest extends Assertions {
       class Get {
 
         @Test
+        @TestSecurity(user = "alice", roles = {"admin", "user"})
         void shouldReturnListWithItemsWhenListExists() {
 
           TaskListCto taskList = new TaskListCto();
@@ -161,11 +187,18 @@ class TaskServiceTest extends Assertions {
         }
 
         @Test
+        @TestSecurity(user = "alice", roles = {"admin", "user"})
         void shouldReturn404WhenListDoesntExist() {
 
           given(TaskServiceTest.this.findTaskList.findWithItems(anyLong())).willReturn(null);
 
           given().when().get("/task/list-with-items/99").then().statusCode(404);
+        }
+
+        @Test
+        @TestSecurity(user = "alice", roles = {})
+        void shouldFailWith403() {
+          given().when().get("/task/list-with-items/99").then().statusCode(403);
         }
       }
     }
@@ -233,7 +266,8 @@ class TaskServiceTest extends Assertions {
     class Post {
 
       @Test
-      void shouldCallSaveUseCaseAndReturn201WhenCreatingTaskItem() {
+      @TestSecurity(user = "alice", roles = {"admin", "user"})
+        void shouldCallSaveUseCaseAndReturn201WhenCreatingTaskItem() {
 
         given(TaskServiceTest.this.saveTaskItem.save(Mockito.any())).willReturn(42L);
 
@@ -247,7 +281,8 @@ class TaskServiceTest extends Assertions {
       }
 
       @Test
-      void shouldFailWith400AndValidationErrorWhenTitleIsEmpty() {
+      @TestSecurity(user = "alice", roles = {"admin", "user"})
+        void shouldFailWith400AndValidationErrorWhenTitleIsEmpty() {
 
         given().when().body("{ \"title\": \"\", \"taskListId\": 123 }").contentType(ContentType.JSON)
             .post("/task/item").then().statusCode(400);
@@ -255,7 +290,8 @@ class TaskServiceTest extends Assertions {
       }
 
       @Test
-      void shouldFailWith400AndValidationErrorWhenTaskListIdNotGiven() {
+      @TestSecurity(user = "alice", roles = {"admin", "user"})
+        void shouldFailWith400AndValidationErrorWhenTaskListIdNotGiven() {
 
         given().when().body("{ \"title\": \"Buy Milk\" }").contentType(ContentType.JSON).post("/task/item").then()
             .statusCode(400);
@@ -272,7 +308,8 @@ class TaskServiceTest extends Assertions {
       class Get {
 
         @Test
-        void shouldReturnJsonWhenItemExists() {
+        @TestSecurity(user = "alice", roles = {"admin", "user"})
+          void shouldReturnJsonWhenItemExists() {
 
           given(TaskServiceTest.this.findTaskItem.findById(anyLong())).willReturn(TaskItemMother.complete());
 
@@ -281,7 +318,8 @@ class TaskServiceTest extends Assertions {
         }
 
         @Test
-        void shouldReturn404WhenUnknownTaskItem() {
+        @TestSecurity(user = "alice", roles = {"admin", "user"})
+          void shouldReturn404WhenUnknownTaskItem() {
 
           given(TaskServiceTest.this.findTaskItem.findById(anyLong())).willReturn(null);
 
@@ -289,6 +327,12 @@ class TaskServiceTest extends Assertions {
         }
 
       }
+          @Test
+          @TestSecurity(user = "alice", roles = {})
+          void shouldFailWith403() {
+            given().when().get("/task/item/99").then().statusCode(403);
+          }
+        }
 
       @Nested
       @DisplayName("DELETE")
@@ -296,9 +340,20 @@ class TaskServiceTest extends Assertions {
 
         @Test
         void shouldCallDeleteUseCaseAndReturn204() {
+          @Test
+          @TestSecurity(user = "alice", roles = {"admin", "user"})
+          void shouldCallDeleteUseCaseAndReturn204() {
 
           given().when().delete("/task/item/42").then().statusCode(204);
           then(TaskServiceTest.this.deleteTaskItem).should().delete(42L);
+            given().when().delete("/task/item/42").then().statusCode(204);
+            then(TaskServiceTest.this.deleteTaskItem).should().delete(42l);
+          }
+          @Test
+          @TestSecurity(user = "alice", roles = {})
+          void shouldFailWith403() {
+            given().when().delete("/task/item/42").then().statusCode(403);
+          }
         }
       }
     }
