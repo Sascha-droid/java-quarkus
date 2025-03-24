@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { render } from "react-dom";
 import App from "./app";
 import { DeleteConfirmProvider } from "./provider/deleteConfirmProvider";
@@ -8,7 +9,21 @@ import { TodoProvider } from "./provider/todoProvider";
 import "./styles/styles.css";
 import * as serviceWorkerRegistration from "./worker/serviceWorkerRegistration";
 
-render(
+const Root = () => {
+  const [authenticated, setAuthenticated] = useState(false); // Track authentication status
+
+  useEffect(() => {
+    initKeycloak(() => {
+      console.log("User authenticated, rendering App...");
+      setAuthenticated(true);
+    });
+  }, []);
+
+  if (!authenticated) {
+    return <p>Loading authentication...</p>; // Show a loading message until authenticated
+  }
+
+  return(
   <MainProvider>
     <ThemeProvider>
       <DeleteConfirmProvider>
@@ -22,6 +37,9 @@ render(
   </MainProvider>,
   document.getElementById("root")
 );
+};
+
+render(<Root />, document.getElementById("root"));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
