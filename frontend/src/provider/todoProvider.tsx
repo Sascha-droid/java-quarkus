@@ -7,7 +7,6 @@ import {
 } from "../components/menus/sortMenu";
 import { TaskItemTypeI } from "../types/types";
 import { MainContext } from "./mainProvider";
-import { addAuthHeaders } from "../auth/authUtils";
 
 export const TodoContext = createContext<TodoInterfaceI | null>(null);
 
@@ -26,7 +25,6 @@ export const TodoProvider = ({ children }: PropsI) => {
 
     fetch(`/api/task/list-with-items/${encodeURIComponent(+listId!)}`, {
       method: "GET",
-        headers: addAuthHeaders(),
     })
       .then((response) => response.json())
       .then((json) => setTodos(json.items))
@@ -43,7 +41,9 @@ export const TodoProvider = ({ children }: PropsI) => {
     // Send data to the backend via POST
     fetch("/api/task/item", {
       method: "POST",
-      headers: addAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/json', // Ensure that the correct content type is set
+      },
       body: JSON.stringify(taskItem), // body data type must match "Content-Type" header
     })
       .then((response) => response.json())
@@ -138,7 +138,6 @@ export const TodoProvider = ({ children }: PropsI) => {
   const delTodo = (id: number) => {
     fetch(`/api/task/item/${encodeURIComponent(id)}`, {
       method: "DELETE",
-      headers: addAuthHeaders(),
     })
       .then(() => {
         setTodos(todos.filter((todo) => todo.id !== id));

@@ -3,7 +3,6 @@ import { useRoute } from "wouter";
 import { navigate } from "wouter/use-location";
 import { TaskListTypeI } from "../types/types";
 import { MainContext } from "./mainProvider";
-import { addAuthHeaders } from "../auth/authUtils";
 
 export const TodoListContext = createContext<TodoListInterfaceI | null>(null);
 
@@ -15,16 +14,29 @@ export const TodoListProvider = ({ children }: PropsI) => {
   const [taskLists, setTaskLists] = useState<TaskListTypeI[]>([]);
 
   useEffect(() => {
-    fetch(`/api/task/lists`, {
-      method: "GET",
-      headers: addAuthHeaders(),
-    })
-      .then((response) => response.json())
-      .then((json) => setTaskLists(json))
-      .catch((error) => {
-        console.error(error);
-        setErrorAlert("List could not be loaded!");
-      });
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/task/lists`, {
+          method: 'GET',
+          credentials: 'include', // Ensure cookies are sent for session-based auth
+        });
+
+        if (response.redirected) {
+          // Redirect user to the new URL if a redirect happens
+          window.location.href = response.url;
+          return;
+        }
+
+        // Handle successful response
+        const json = await response.json();
+        setTaskLists(json); // assuming setTaskLists updates your state with the task lists
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setErrorAlert("List could not be loaded!"); // Set error alert in case of failure
+      }
+    };
+
+    fetchData();
   }, [setErrorAlert]);
 
   function editTodoList(newTitle: string) {
@@ -39,7 +51,9 @@ export const TodoListProvider = ({ children }: PropsI) => {
 
       fetch("/api/task/list", {
         method: "POST",
-        headers: addAuthHeaders(),
+        headers: {
+          'Content-Type': 'application/json', // Ensure that the correct content type is set
+        },
         body: JSON.stringify(taskList),
       })
         .then((response) => response.json())
@@ -65,7 +79,9 @@ export const TodoListProvider = ({ children }: PropsI) => {
 
       fetch("/api/task/list", {
         method: "POST",
-        headers: addAuthHeaders(),
+        headers: {
+          'Content-Type': 'application/json', // Ensure that the correct content type is set
+        },
         body: JSON.stringify(taskList), // body data type must match "Content-Type" header
       })
         .then((response) => response.json())
@@ -85,7 +101,6 @@ export const TodoListProvider = ({ children }: PropsI) => {
   const delTaskList = (id: number) => {
     fetch(`/api/task/list/${encodeURIComponent(id)}`, {
       method: "DELETE",
-      headers: addAuthHeaders(),
     })
       .then(() => {
         setTaskLists(taskLists.filter((taskList) => taskList.id !== id));
