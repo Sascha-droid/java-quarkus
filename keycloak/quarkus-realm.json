@@ -13,7 +13,10 @@
         "http://localhost:8080/*"
       ],
       "publicClient": true,
-      "implicitFlowEnabled": true
+      "implicitFlowEnabled": true,
+      "webOrigins": [
+        "*"
+      ]
     },
     {
       "clientId": "frontend-app",
@@ -28,7 +31,7 @@
       "publicClient": true,
       "implicitFlowEnabled": true,
       "webOrigins": [
-        "http://localhost:5173"
+        "*"
       ]
     }
   ],

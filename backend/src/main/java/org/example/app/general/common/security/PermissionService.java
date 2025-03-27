@@ -1,10 +1,10 @@
 package org.example.app.general.common.security;
 
-import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.jwt.auth.principal.ParseException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +17,18 @@ import static org.example.app.general.common.security.ApplicationAccessControlCo
 public class PermissionService {
 
     @Inject
-    SecurityIdentity securityIdentity;
+    JwtService jwtService;
 
-    private List<String> getPermissions(){
+    @Inject
+    SessionService sessionService;
+
+    @Inject
+    ContainerRequestContext requestContext;
+
+    private List<String> getPermissions() throws ParseException {
         List<String> permissions = new ArrayList<>();
-        List<String> roles = securityIdentity.getRoles().stream().map(String::toUpperCase).toList();
+        String sessionId = requestContext.getCookies().get("SESSION_ID").getValue();
+        List<String> roles = jwtService.getRoles(sessionService.getSession(sessionId).get().getJwt());
         roles.forEach(role->{
                 Roles userRole = Roles.valueOf(role.toUpperCase());
                 switch (userRole) {
@@ -46,10 +53,14 @@ public class PermissionService {
     }
 
     public Response checkPermission(String requiredPermission) {
-        if (!getPermissions().contains(requiredPermission)) {
-            return Response.status(Response.Status.FORBIDDEN)
-                    .entity("Access Denied: No valid permissions for the current user")
-                    .build();
+        try {
+            if (!getPermissions().contains(requiredPermission)) {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .entity("Access Denied: No valid permissions for the current user")
+                        .build();
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
         return null;  // Return null if the user has permission
     }

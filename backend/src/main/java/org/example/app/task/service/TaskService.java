@@ -43,7 +43,6 @@ import java.util.Map;
  * Rest service for {@link org.example.app.task.common.TaskList}.
  */
 @Path("/task")
-@Authenticated
 public class TaskService {
 
   @Inject
