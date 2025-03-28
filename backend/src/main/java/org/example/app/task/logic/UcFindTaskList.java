@@ -1,5 +1,6 @@
 package org.example.app.task.logic;
 
+import java.util.List;
 import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -55,6 +56,12 @@ public class UcFindTaskList {
     cto.setList(this.taskListMapper.toEto(taskListEntity));
     cto.setItems(this.taskItemMapper.toEtos(taskListEntity.getItems()));
     return cto;
+  }
+
+  public List<TaskListEto> findAll() {
+
+    List<TaskListEntity> taskList = this.taskListRepository.findAll();
+    return taskList.stream().map(taskListEntity -> this.taskListMapper.toEto(taskListEntity)).toList();
   }
 
 }
