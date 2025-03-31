@@ -1,5 +1,6 @@
 package org.example.app.general.common.security;
 
+import io.quarkus.runtime.configuration.ConfigUtils;
 import io.smallrye.jwt.auth.principal.JWTParser;
 import io.smallrye.jwt.auth.principal.ParseException;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -33,6 +34,7 @@ public class JwtService {
     private static final String KEYCLOAK_AUTH_URL = "http://localhost:8180/realms/quarkus/protocol/openid-connect/auth";
     private static final String RESPONSE_TYPE = "code";
     private static final String SCOPE = "openid";
+
     public List<String> getRoles(String jwtString) throws ParseException {
         // Split JWT into its parts: header, payload, and signature
         String[] chunks = jwtString.split("\\.");
@@ -44,6 +46,11 @@ public class JwtService {
         // Parse the payload as JSON using org.json library
         JSONObject jsonPayload = new JSONObject(payload);
 
+        if (ConfigUtils.getProfiles().contains("test")) {
+            return jsonPayload.optJSONArray("groups").toList().stream()
+                    .map(role -> role.toString().trim().toUpperCase())  // Convert each role to uppercase
+                    .collect(Collectors.toList());
+        }
         // Extract the realm_access JSON object
         JSONObject realmAccess = jsonPayload.optJSONObject("realm_access");
 

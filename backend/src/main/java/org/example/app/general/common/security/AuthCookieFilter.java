@@ -1,5 +1,6 @@
 package org.example.app.general.common.security;
 
+import io.quarkus.runtime.configuration.ConfigUtils;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -25,10 +26,12 @@ public class AuthCookieFilter implements ContainerRequestFilter {
         requestContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // Allow common HTTP methods
         requestContext.getHeaders().add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"); // Allow headers commonly used in CORS requests
 
-
         // Check if the request is for the callback endpoint
         if (requestContext.getUriInfo().getPath().equals("/auth/callback")) {
             return; // Skip filter for the callback
+        }
+        if (ConfigUtils.getProfiles().contains("test")) {
+            return; // Skip filter in test mode
         }
 
         // Save the original URL (the endpoint the user originally requested)

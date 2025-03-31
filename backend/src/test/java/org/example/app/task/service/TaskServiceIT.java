@@ -4,6 +4,8 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.not;
 
+import io.quarkus.test.junit.TestProfile;
+import org.example.app.task.resource.KeycloakTokenProvider;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -18,19 +20,26 @@ import io.restassured.response.Response;
  */
 @QuarkusIntegrationTest
 @TestMethodOrder(OrderAnnotation.class)
+@TestProfile(IntegrationTestProfile.class)
 @TestInstance(Lifecycle.PER_CLASS)
-@Disabled
 class TaskServiceIT {
 
   private Integer taskListId;
 
   private Integer taskItemId;
 
+  private String token;
+
+  @BeforeAll
+  void getJwt(){
+    token = KeycloakTokenProvider.getAccessTokenWithAdmin();
+  }
+
   @Test
   @Order(1)
   void shouldAllowCreatingANewTaskList() {
 
-    Response response = given().when().body("{ \"title\": \"Shopping List\" }").contentType(ContentType.JSON)
+    Response response = given().when().header("Authorization", token).body("{ \"title\": \"Shopping List\" }").contentType(ContentType.JSON)
         .post("/task/list");
     response.then().statusCode(201).header("Location", not(emptyString()));
 
@@ -41,7 +50,7 @@ class TaskServiceIT {
   @Order(2)
   void shouldAllowAddingATaskToATaskList() {
 
-    Response response = given().when().body("{ \"title\": \"Buy Milk\", \"taskListId\": " + this.taskListId + " }")
+    Response response = given().when().header("Authorization", token).body("{ \"title\": \"Buy Milk\", \"taskListId\": " + this.taskListId + " }")
         .contentType(ContentType.JSON).post("/task/item");
 
     response.then().statusCode(201).header("Location", not(emptyString()));
@@ -53,7 +62,7 @@ class TaskServiceIT {
   @Order(3)
   void shouldAllowRetrievingATaskListWithTaskItems() {
 
-    given().when().get("/task/list-with-items/{taskListId}", this.taskListId).then().statusCode(200)
+    given().when().header("Authorization", token).get("/task/list-with-items/{taskListId}", this.taskListId).then().statusCode(200)
         .body("list.title", Matchers.equalTo("Shopping List")).and().body("list.id", Matchers.equalTo(this.taskListId))
         .and().body("items[0].title", Matchers.equalTo("Buy Milk"));
   }
@@ -62,9 +71,9 @@ class TaskServiceIT {
   @Order(4)
   void shouldAllowDeletingATaskListCompletely() {
 
-    given().when().delete("/task/list/{taskListId}", this.taskListId).then().statusCode(204);
-    given().when().get("/task/list/{taskListId}", this.taskListId).then().statusCode(404);
-    given().when().get("/task/item/{itemId}", this.taskItemId).then().statusCode(404);
+    given().when().header("Authorization", token).delete("/task/list/{taskListId}", this.taskListId).then().statusCode(204);
+    given().when().header("Authorization", token).get("/task/list/{taskListId}", this.taskListId).then().statusCode(404);
+    given().when().header("Authorization", token).get("/task/item/{itemId}", this.taskItemId).then().statusCode(404);
 
   }
 }
