@@ -21,30 +21,17 @@ public class AuthCookieFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        requestContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:3000"); // Allow frontend to access the backend
-        requestContext.getHeaders().add("Access-Control-Allow-Credentials", "true"); // Allow credentials (cookies)
-        requestContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // Allow common HTTP methods
-        requestContext.getHeaders().add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"); // Allow headers commonly used in CORS requests
-
-        // Check if the request is for the callback endpoint
-        if (requestContext.getUriInfo().getPath().equals("/auth/callback")) {
-            return; // Skip filter for the callback
-        }
-        if (ConfigUtils.getProfiles().contains("test")) {
-            return; // Skip filter in test mode
+        if (requestContext.getUriInfo().getPath().equals("/auth/callback") || ConfigUtils.getProfiles().contains("test")) {
+            return; // Skip filter for the callback or test mode
         }
 
         // Save the original URL (the endpoint the user originally requested)
         String originalUrl = requestContext.getHeaderString("Referer");
 
-        // Store the original URL in the session or as a query parameter
-        // For simplicity, we store it as a query parameter
         String authRedirectUrl = jwtService.buildKeycloakAuthUrl();
-
-        // Retrieve session cookie and check if valid
         Cookie sessionCookie = requestContext.getCookies().get("SESSION_ID");
 
-        if (sessionCookie == null || !isValidSession(sessionCookie.getValue())) {
+        if (!isValidSession(sessionCookie.getValue())) {
             sessionService.storeSession(sessionCookie.getValue(), "", originalUrl);
             // Redirect to Keycloak if no valid session found
             requestContext.abortWith(
@@ -57,6 +44,6 @@ public class AuthCookieFilter implements ContainerRequestFilter {
 
     private boolean isValidSession(String sessionId) {
         Optional<Session> session = sessionService.getSession(sessionId);
-        return sessionService.getSession(sessionId).isPresent() && !session.get().getJwt().isEmpty();
+        return session.isPresent() && !session.get().getJwt().isEmpty();
     }
 }

@@ -8,8 +8,8 @@ public class Session {
     }
 
     // Constructor
-    public Session(String authCode, String originalUrl) {
-        this.jwt = authCode;
+    public Session(String jwt, String originalUrl) {
+        this.jwt = jwt;
         this.originalUrl = originalUrl;
     }
 

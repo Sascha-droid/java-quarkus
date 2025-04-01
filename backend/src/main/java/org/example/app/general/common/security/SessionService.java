@@ -23,23 +23,20 @@ import java.util.Optional;
 public class SessionService {
 
     private final ValueCommands<String, String> redis;
-    private final KeyCommands<String> keyCommands;
     private final ObjectMapper objectMapper; // Jackson ObjectMapper to serialize/deserialize
 
     @Inject
     public SessionService(RedisDataSource redisDataSource) {
         this.redis = redisDataSource.value(String.class);
-        this.keyCommands = redisDataSource.key(String.class);
-        this.objectMapper = new ObjectMapper(); // Initialize ObjectMapper
+        this.objectMapper = new ObjectMapper();
     }
 
     private static final long SESSION_EXPIRY_SECONDS = 600; // 10 min expiry
 
     // Store session containing JWT and original URL
-    public void storeSession(String sessionId, String authCode, String originalUrl) {
+    public void storeSession(String sessionId, String jwt, String originalUrl) {
         try {
-            // Create a Session object to store both JWT and original URL
-            Session session = new Session(authCode, originalUrl);
+            Session session = new Session(jwt, originalUrl);
 
             // Serialize session to JSON
             String sessionJson = objectMapper.writeValueAsString(session);
@@ -67,9 +64,5 @@ public class SessionService {
             e.printStackTrace();
             return Optional.empty();
         }
-    }
-
-    public void deleteSession(String sessionId) {
-        keyCommands.del(sessionId); // Use KeyCommands to delete session
     }
 }

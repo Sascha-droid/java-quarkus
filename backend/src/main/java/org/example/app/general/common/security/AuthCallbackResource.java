@@ -31,7 +31,6 @@ public class AuthCallbackResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Authorization code missing").build();
         }
 
-        // Step 2: Get the session ID from the cookie
         Cookie sessionCookie = headers.getCookies().get("SESSION_ID");
         if (sessionCookie == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing session ID cookie").build();
@@ -40,13 +39,12 @@ public class AuthCallbackResource {
         String originalUrl = sessionService.getSession(sessionId).get().getOriginalUrl();
 
         String jwt = jwtService.exchangeCodeForToken(code);
-        // Step 3: Store the code in Redis under the session ID
         sessionService.storeSession(sessionId, jwt, "");
 
-        // Step 4: Redirect to the original URL the user wanted to access
+        // Redirect to the original URL the user wanted to access
         if (originalUrl != null && !originalUrl.isEmpty()) {
             return Response.status(Response.Status.FOUND)
-                    .header("Location", originalUrl)  // Redirect to the original URL
+                    .header("Location", originalUrl)
                     .build();
         } else {
             return Response.ok("Authenticated").build();

@@ -17,22 +17,6 @@
       "webOrigins": [
         "*"
       ]
-    },
-    {
-      "clientId": "frontend-app",
-      "enabled": true,
-      "protocol": "openid-connect",
-      "rootUrl": "http://localhost:5173",
-      "adminUrl": "http://localhost:5173",
-      "baseUrl": "http://localhost:5173",
-      "redirectUris": [
-        "http://localhost:5173/*"
-      ],
-      "publicClient": true,
-      "implicitFlowEnabled": true,
-      "webOrigins": [
-        "*"
-      ]
     }
   ],
   "roles": {

@@ -13,12 +13,7 @@ export default defineConfig(() => {
           '/api': {
             target: 'http://localhost:8080',
             changeOrigin: true,
-            rewrite: (path) => path.replace("/api", ""),
-            headers: {
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-              'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
-          }
+            rewrite: (path) => path.replace("/api", "")
           }
         }
     }

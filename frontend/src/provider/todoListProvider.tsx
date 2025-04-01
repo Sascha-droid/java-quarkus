@@ -18,24 +18,20 @@ export const TodoListProvider = ({ children }: PropsI) => {
       try {
         const response = await fetch(`/api/task/lists`, {
           method: 'GET',
-          credentials: 'include', // Ensure cookies are sent for session-based auth
+          credentials: 'include',
         });
-
-        if (response.redirected) {
-          // Redirect user to the new URL if a redirect happens
-          window.location.href = response.url;
-          return;
+        if (response.status === 401) {
+          const data = await response.json();
+          window.location.href = data.redirectUrl;  // Redirect to Keycloak
+        } else {
+          const json = await response.json();
+          setTaskLists(json);
         }
-
-        // Handle successful response
-        const json = await response.json();
-        setTaskLists(json); // assuming setTaskLists updates your state with the task lists
       } catch (error) {
         console.error('Error fetching data:', error);
         setErrorAlert("List could not be loaded!"); // Set error alert in case of failure
       }
     };
-
     fetchData();
   }, [setErrorAlert]);
 
@@ -102,7 +98,11 @@ export const TodoListProvider = ({ children }: PropsI) => {
     fetch(`/api/task/list/${encodeURIComponent(id)}`, {
       method: "DELETE",
     })
-      .then(() => {
+      .then((res) => {
+        if(res.status === 403){
+          setErrorAlert("List could not be deleted (No permissions)!");
+          return;
+        }
         setTaskLists(taskLists.filter((taskList) => taskList.id !== id));
         if (undefined !== listId && id === +listId) {
           navigate("/");

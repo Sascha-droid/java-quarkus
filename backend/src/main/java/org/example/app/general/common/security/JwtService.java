@@ -29,7 +29,6 @@ public class JwtService {
 
     private static final String KEYCLOAK_TOKEN_URL = "http://localhost:8180/realms/quarkus/protocol/openid-connect/token";
     private static final String CLIENT_ID = "backend-service";
-    private static final String CLIENT_SECRET = "jYAq8oBWFQDOydkVwl5RNmiKMmKL1htC";  // Use your actual client secret
     private static final String REDIRECT_URI = "http://localhost:8080/auth/callback"; // This must be the same as the one used in the authorization request
     private static final String KEYCLOAK_AUTH_URL = "http://localhost:8180/realms/quarkus/protocol/openid-connect/auth";
     private static final String RESPONSE_TYPE = "code";
@@ -43,7 +42,7 @@ public class JwtService {
         Base64.Decoder decoder = Base64.getUrlDecoder();
         String payload = new String(decoder.decode(chunks[1]));
 
-        // Parse the payload as JSON using org.json library
+        // Parse the payload as JSONObject
         JSONObject jsonPayload = new JSONObject(payload);
 
         if (ConfigUtils.getProfiles().contains("test")) {
@@ -51,17 +50,14 @@ public class JwtService {
                     .map(role -> role.toString().trim().toUpperCase())  // Convert each role to uppercase
                     .collect(Collectors.toList());
         }
-        // Extract the realm_access JSON object
         JSONObject realmAccess = jsonPayload.optJSONObject("realm_access");
 
         // Check if the realm_access is found and contains the "roles" array
         if (realmAccess != null) {
-            // Get the "roles" array inside the realm_access object
             List<String> roles = realmAccess.optJSONArray("roles").toList().stream()
                     .map(role -> role.toString().trim().toUpperCase())  // Convert each role to uppercase
                     .collect(Collectors.toList());
 
-            // Return the roles list
             return roles;
         } else {
             // If realm_access or roles are not found, return an empty list or handle the case
@@ -74,7 +70,6 @@ public class JwtService {
 
         Form form = new Form();
         form.param("client_id", CLIENT_ID);
-        form.param("client_secret", CLIENT_SECRET); // Only needed if your client is confidential
         form.param("code", code);
         form.param("redirect_uri", REDIRECT_URI);
         form.param("grant_type", "authorization_code");
