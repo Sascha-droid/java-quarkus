@@ -12,10 +12,7 @@ export const initKeycloak = (onAuthenticatedCallback: () => void) => {
       console.log('Keycloak authenticated');
 
       // Save the token in localStorage
-      localStorage.setItem('keycloakToken', keycloak.token!); // Store token
-
-      // Optionally, store the token expiration time as well (in seconds)
-      localStorage.setItem('keycloakTokenExpiry', keycloak.tokenParsed?.exp?.toString() || '');
+      localStorage.setItem('keycloakToken', keycloak.token!);
 
       onAuthenticatedCallback();
     } else {

@@ -3,7 +3,7 @@ const getAuthToken = (): string | null => {
     return token;
 };
 
-export const addAuthHeaders = (headers: HeadersInit = {}): HeadersInit => {
+export const addHeaders = (headers: HeadersInit = {}): HeadersInit => {
     const token = getAuthToken();
 
     const headersObj = new Headers(headers);
